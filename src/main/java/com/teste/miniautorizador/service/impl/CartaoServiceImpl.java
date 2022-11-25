@@ -13,11 +13,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teste.miniautorizador.dominio.Cartao;
 import com.teste.miniautorizador.dto.CartaoDTO;
 import com.teste.miniautorizador.dto.TransacaoDTO;
+import com.teste.miniautorizador.enums.OperacaoTipo;
 import com.teste.miniautorizador.exception.CartaoJaExisteException;
 import com.teste.miniautorizador.exception.CartaoSemSaldoException;
 import com.teste.miniautorizador.exception.TransacaoAutorizacaoBarradaException;
 import com.teste.miniautorizador.repository.CartaoRepository;
 import com.teste.miniautorizador.service.CartaoService;
+import com.teste.miniautorizador.service.OperacaoService;
 
 @Service
 public class CartaoServiceImpl implements CartaoService {
@@ -26,6 +28,9 @@ public class CartaoServiceImpl implements CartaoService {
 
 	@Autowired
 	private CartaoRepository repository;
+	
+	@Autowired
+	private OperacaoService operacaoService;
 
 	public BigDecimal obterSaldoCartao(String numeroCartao) throws CartaoSemSaldoException{		
 		Optional<Cartao> optionalCartao = findByNumeroCartao(numeroCartao);
@@ -36,8 +41,7 @@ public class CartaoServiceImpl implements CartaoService {
 	public CartaoDTO criarCartao(CartaoDTO cartaoDTO) throws CartaoJaExisteException, JsonProcessingException {		
 		lancarExcecaoSeNumeroCartaoExistir(cartaoDTO);
 						
-		Cartao cartao = new Cartao(null, cartaoDTO.getNumeroCartao(), cartaoDTO.getSenha(), new BigDecimal(500), null);  
-		repository.save(cartao);		
+		Cartao cartao = (Cartao) operacaoService.process(OperacaoTipo.CRIAR_CARTAO.getName(), cartaoDTO);
 						
 		return cartaoDTO;
 	}	
