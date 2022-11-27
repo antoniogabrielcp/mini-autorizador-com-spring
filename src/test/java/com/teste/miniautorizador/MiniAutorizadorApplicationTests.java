@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teste.miniautorizador.dominio.Cartao;
 import com.teste.miniautorizador.dto.CartaoDTO;
+import com.teste.miniautorizador.dto.TransacaoDTO;
 import com.teste.miniautorizador.repository.CartaoRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -78,4 +79,32 @@ class MiniAutorizadorApplicationTests {
 		assertEquals(new BigDecimal("500.00"), response.getBody());
 
 	}
+	
+	@Test
+	public void efetuarTransacao() throws Exception {
+			
+		String numeroCartao = "6549873025634511";	
+		Cartao cartao = new Cartao(null, numeroCartao, "1234", new BigDecimal(500), null);			
+		cartaoRepository.save(cartao);		
+		
+		final String baseUrl = "http://localhost:"+ port +"/";				
+		URI uri = new URI(baseUrl + "transacoes");
+		
+		TransacaoDTO transacaoDTO = new TransacaoDTO();
+		transacaoDTO.setNumeroCartao(numeroCartao);
+		transacaoDTO.setSenhaCartao("1234");
+		transacaoDTO.setValor(new BigDecimal(10));
+		
+		HttpHeaders headers = new HttpHeaders();
+
+		HttpEntity<TransacaoDTO> request = new HttpEntity<>(transacaoDTO, headers);
+		
+		ResponseEntity<String> response = restTemplate.postForEntity(uri, request, String.class);
+	    
+	    //Verify request succeed
+	    assertEquals(200, response.getStatusCodeValue());					
+		assertEquals("OK", response.getBody());
+
+	}	
+	
 }

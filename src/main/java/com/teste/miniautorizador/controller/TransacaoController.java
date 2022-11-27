@@ -11,14 +11,14 @@ import com.teste.miniautorizador.exception.TransacaoAutorizacaoBarradaException;
 import com.teste.miniautorizador.service.TransacaoService;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/transacoes")
 public class TransacaoController {
 
 	@Autowired
 	private TransacaoService service;	
 
-	@PostMapping("transacoes")
-	public String criarCartao(@RequestBody TransacaoDTO transacaoDTO) throws TransacaoAutorizacaoBarradaException{
+	@PostMapping
+	public String efetuarTransacao(@RequestBody TransacaoDTO transacaoDTO) throws TransacaoAutorizacaoBarradaException{
 		return service.efetuarTransacao(transacaoDTO);		
 	}	
 }
